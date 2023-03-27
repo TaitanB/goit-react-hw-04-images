@@ -147,7 +147,7 @@ export class App extends Component {
 
     this.setState(() => {
       console.log('Закрили модалку, оновився стейт App');
-      
+
       return { showModal: false, largeImageURL: '' };
     });
   };
@@ -156,8 +156,13 @@ export class App extends Component {
     console.log('App componentDidMount');
   }
 
-  componentDidUpdate(prevState) {
+  componentDidUpdate(prevProps, prevState) {
     console.log('App componentDidUpdate');
+    if (prevState.SearchQuery !== this.state.SearchQuery) {
+      console.log(prevState.SearchQuery);
+      console.log(this.state.SearchQuery);
+      // this.onSearch(this.state.SearchQuery);
+    }
   }
 
   render() {
