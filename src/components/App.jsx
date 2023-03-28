@@ -1,6 +1,5 @@
 import { Component } from 'react';
 import { Notify } from 'notiflix';
-import axios from 'axios';
 
 import { ImageGallery } from './ImageGallery';
 import { Searchbar } from './Searchbar';
@@ -8,6 +7,7 @@ import { Button } from './Button';
 import { Modal } from './Modal';
 import { Loader } from './Loader';
 import css from './styles.module.css';
+import { onFetch } from './pixabay-api';
 
 export class App extends Component {
   state = {
@@ -19,156 +19,108 @@ export class App extends Component {
     showModal: false,
   };
 
-  onFetch = async SearchQuery => {
-    console.log('onFetch');
+  // componentDidMount() {
+  //   console.log('App componentDidMount');
+  // }
 
-    const API_KEY = '33528220-6f12bec756615243821cbd5de';
-
-    this.setState(() => {
-      console.log('Додаємо лоадер, оновився стейт App');
-
-      return { loading: true };
-    });
-
-    try {
-      console.log('Відправляємо запит на api');
-
-      const response = await axios.get(
-        `https://pixabay.com/api/?q=${SearchQuery}&page=${this.state.page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
-      );
-
-      this.onSearch(response, SearchQuery);
-
-      console.log(`Отримали відповідь: ${response.data.hits}`);
-    } catch (error) {
-      this.setState(() =>
-        Notify.failure('Sorry, something went wrong...', error)
-      );
-    } finally {
-      this.setState({ loading: false });
-    }
+  handleSearchSubmit = SearchQuery => {
+    this.setState({ SearchQuery });
   };
-
-  onSearch = (response, SearchQuery) => {
-    console.log(`this.state.images: ${this.state.images}`);
-    console.log(`response.data.hits: ${response.data.hits}`);
-    console.log(`SearchQuery: ${SearchQuery}`);
-    console.log(`this.state.SearchQuery: ${this.state.SearchQuery}`);
-
-    if (response.data.hits.length > 0) {
-      // if (SearchQuery !== this.state.SearchQuery) {
-      //   this.setState(() => {
-      //     console.log(`Новий пошук`);
-      //     return {
-      //       images: [...response.data.hits],
-      //       page: 1,
-      //       SearchQuery,
-      //     };
-      //   });
-      // } else {
-      this.setState(() => {
-        console.log('Пошук не змінився');
-
-        return {
-          images: [...this.state.images, ...response.data.hits],
-          page: this.state.page + 1,
-          SearchQuery,
-        };
-      });
-      // }
-    } else {
-      Notify.info('Sorry, there are no pictures matching your search.');
-    }
-  };
-
-  // onSubmitFetch = async SearchQuery => {
-  //   console.log('onSubmitFetch, перший запит');
-
-  //   const response = await fetch(
-  //     `https://pixabay.com/api/?q=${SearchQuery}&page=${this.state.page}&key=33528220-6f12bec756615243821cbd5de&image_type=photo&orientation=horizontal&per_page=12`
-  //   )
-  //     .then(response => response.json())
-  //     .catch(error => Notify.failure('Sorry, something went wrong...', error));
-
-  //   if (SearchQuery !== this.state.SearchQuery) {
-  //     this.setState(() => {
-  //       console.log('Якщо новий запит, починаємо з першої сторінки');
-  //       return { images: this.state.images, page: 1, SearchQuery };
-  //     });
-  //   } else {
-  //     this.setState(() => {
-  //       console.log('Перший запит, або запит не змінився');
-  //       return { SearchQuery, loading: true };
-  //     });
-
-  //     if (response && response.hits.length > 0) {
-  //       this.setState(() => {
-  //         return {
-  //           images: [...this.state.images, ...response.hits],
-  //           page: this.state.page + 1,
-  //           loading: false,
-  //         };
-  //       });
-  //     } else {
-  //       Notify.info('Sorry, there are no pictures matching your search.');
-  //       this.setState({
-  //         images: [],
-  //         loading: false,
-  //       });
-  //     }
-  //   }
-  // };
 
   loadMore = event => {
-    console.log('loadMore');
+    // console.log('loadMore');
 
     event.preventDefault();
 
-    console.log(this.state.SearchQuery);
+    this.setState(() => {
+      // console.log('loading: true');
 
-    this.onFetch(this.state.SearchQuery);
+      return {
+        loading: true,
+      };
+    });
+
+    onFetch(this.state.SearchQuery, this.state.page + 1).then(images => {
+      if (images && images.length > 0) {
+        this.setState(() => {
+          // console.log('8. Завантажуємо наступну сторінку, loading: false');
+
+          return {
+            images: [...this.state.images, ...images],
+            page: this.state.page + 1,
+            loading: false,
+          };
+        });
+      }
+    });
   };
 
   onShowModal = event => {
-    console.log('onShowModal');
-
     this.setState(() => {
-      console.log('Відкрили модалку, оновився стейт App');
+      // console.log('Відкрили модалку, оновився стейт App');
 
-      return {
-        showModal: true,
-        largeImageURL: event,
-      };
+      return { showModal: true, largeImageURL: event };
     });
   };
 
   onCloseModal = () => {
-    console.log('onCloseModal');
-
     this.setState(() => {
-      console.log('Закрили модалку, оновився стейт App');
+      // console.log('Закрили модалку, оновився стейт App');
 
       return { showModal: false, largeImageURL: '' };
     });
   };
 
-  componentDidMount() {
-    console.log('App componentDidMount');
-  }
-
   componentDidUpdate(prevProps, prevState) {
-    console.log('App componentDidUpdate');
+    // console.log('App componentDidUpdate');
+
     if (prevState.SearchQuery !== this.state.SearchQuery) {
-      console.log(prevState.SearchQuery);
-      console.log(this.state.SearchQuery);
-      // this.onSearch(this.state.SearchQuery);
+      // console.log(`Попередній запит: ${prevState.SearchQuery}`);
+      // console.log(`Поточний запит: ${this.state.SearchQuery}`);
+
+      this.setState(() => {
+        // console.log('loading: true');
+
+        return {
+          loading: true,
+        };
+      });
+
+      onFetch(this.state.SearchQuery, 1).then(images => {
+        if (images && images.length > 0) {
+          this.setState(() => {
+            // console.log(
+            //   '7. Новий запит, починаємо з першої сторінки, loading: false'
+            // );
+
+            return {
+              images,
+              page: 1,
+              SearchQuery: this.state.SearchQuery,
+              loading: false,
+            };
+          });
+        } else {
+          // console.log(`Попередній запит: ${prevState.SearchQuery}`);
+          // console.log(`Поточний запит: ${this.state.SearchQuery}`);
+          // console.log(
+          //   '7.1 Вибачте, немає зображень, що відповідають вашому запиту, loading: false'
+          // );
+
+          Notify.info('Sorry, there are no pictures matching your search.');
+          this.setState({
+            images: [],
+            loading: false,
+          });
+        }
+      });
     }
   }
 
   render() {
     return (
       <div className={css.App}>
-        <Searchbar onSubmit={this.onFetch} />
+        <Searchbar onSubmit={this.handleSearchSubmit} />
         {this.state.loading && (
           <div className={css.Loader}>
             <Loader />

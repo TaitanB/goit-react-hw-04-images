@@ -4,19 +4,19 @@ import css from './styles.module.css';
 
 export class Modal extends Component {
   componentDidMount() {
-    console.log('Modal componentDidMount, додали слухача на віндовс');
+    // console.log('Modal componentDidMount, додали слухача на віндовс');
     window.addEventListener('keydown', this.handleClose);
   }
 
   componentWillUnmount() {
-    console.log('Modal componentWillUnmount, видалили слухача на віндовс');
+    // console.log('Modal componentWillUnmount, видалили слухача на віндовс');
     window.removeEventListener('keydown', this.handleClose);
   }
 
   handleClose = event => {
-    console.log('handleClose');
+    // console.log('handleClose');
     if (event.code === 'Escape') {
-      console.log('При натисканні Escape закриваємо модалку');
+      // console.log('При натисканні Escape закриваємо модалку');
 
       return this.props.onCloseModal();
     }

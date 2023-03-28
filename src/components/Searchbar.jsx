@@ -10,37 +10,33 @@ export class Searchbar extends Component {
   };
 
   handleChange = event => {
-    console.log('handleChange');
-
     event.preventDefault();
 
     this.setState(() => {
-      console.log('Ввели пошуковий запит в інпут, оновився стейт Searchbar');
+      // console.log('1. Ввели пошуковий запит в інпут, оновився стейт Searchbar');
 
       return { inputValue: event.target.value };
     });
   };
 
   handleSubmit = event => {
-    console.log('handleSubmit');
-
     event.preventDefault();
 
     if (this.state.inputValue.trim() !== '') {
-      console.log(
-        'Якщо запит, введений в інпут валідний, відправляємо його в Арр'
-      );
+      console
+        .log
+        // '2. Запит, введений в інпут валідний, відправляємо його в Арр'
+        ();
 
       this.props.onSubmit(this.state.inputValue);
     } else {
-      console.log('Якщо запит не валідний, виводимо інформаційне вікно');
+      // console.log('2.1 Запит не валідний, виводимо інформаційне вікно');
 
       Notify.info('Please enter a valid value.');
-
       return;
     }
     this.setState(() => {
-      console.log('Очистився інпут, оновився стейт Searchbar');
+      // console.log('3. Очистився інпут, оновився стейт Searchbar');
 
       return { inputValue: '' };
     });
