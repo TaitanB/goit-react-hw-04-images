@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { Notify } from 'notiflix';
 import { BiSearchAlt } from 'react-icons/bi';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import css from './styles.module.css';
 
 export class Searchbar extends Component {
@@ -23,10 +23,9 @@ export class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.inputValue.trim() !== '') {
-      console
-        .log
-        // '2. Запит, введений в інпут валідний, відправляємо його в Арр'
-        ();
+      // console.log(
+      //   '2. Запит, введений в інпут валідний, відправляємо його в Арр'
+      // );
 
       this.props.onSubmit(this.state.inputValue);
     } else {
@@ -35,11 +34,6 @@ export class Searchbar extends Component {
       Notify.info('Please enter a valid value.');
       return;
     }
-    this.setState(() => {
-      // console.log('3. Очистився інпут, оновився стейт Searchbar');
-
-      return { inputValue: '' };
-    });
   };
 
   render() {
@@ -72,5 +66,5 @@ export class Searchbar extends Component {
 }
 
 Searchbar.propTypes = {
-  onSubmit: propTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };

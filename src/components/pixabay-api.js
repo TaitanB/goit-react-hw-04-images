@@ -5,7 +5,9 @@ export const onFetch = async (SearchQuery, page) => {
   const API_KEY = '33528220-6f12bec756615243821cbd5de';
 
   try {
-    // console.log(`5. Відправляємо запит на api по значенню ${SearchQuery}`);
+    // console.log(
+    //   `5. Відправляємо запит на api по значенню ${SearchQuery} сторінка ${page}`
+    // );
 
     const response = await axios.get(
       `https://pixabay.com/api/?q=${SearchQuery}&page=${page}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`

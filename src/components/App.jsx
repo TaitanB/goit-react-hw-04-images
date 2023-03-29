@@ -24,7 +24,31 @@ export class App extends Component {
   // }
 
   handleSearchSubmit = SearchQuery => {
-    this.setState({ SearchQuery });
+    if (SearchQuery !== this.state.SearchQuery) {
+      // console.log(`Попередній запит: ${this.state.SearchQuery}`);
+      // console.log(`Поточний запит: ${SearchQuery}`);
+      // console.log('7. Новий запит, починаємо з першої сторінки');
+
+      this.setState(() => {
+        return {
+          SearchQuery,
+          page: 1,
+        };
+      });
+    }
+    if (SearchQuery === this.state.SearchQuery) {
+      Notify.info(
+        `You are already viewing images for the query ${SearchQuery}.`
+      );
+    } else {
+      this.setState(() => {
+        return {
+          images: [],
+          SearchQuery,
+          page: 1,
+        };
+      });
+    }
   };
 
   loadMore = event => {
@@ -33,25 +57,11 @@ export class App extends Component {
     event.preventDefault();
 
     this.setState(() => {
-      // console.log('loading: true');
+      // console.log('8. Завантажуємо наступну сторінку');
 
       return {
-        loading: true,
+        page: this.state.page + 1,
       };
-    });
-
-    onFetch(this.state.SearchQuery, this.state.page + 1).then(images => {
-      if (images && images.length > 0) {
-        this.setState(() => {
-          // console.log('8. Завантажуємо наступну сторінку, loading: false');
-
-          return {
-            images: [...this.state.images, ...images],
-            page: this.state.page + 1,
-            loading: false,
-          };
-        });
-      }
     });
   };
 
@@ -74,39 +84,34 @@ export class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     // console.log('App componentDidUpdate');
 
-    if (prevState.SearchQuery !== this.state.SearchQuery) {
+    if (
+      prevState.SearchQuery !== this.state.SearchQuery ||
+      prevState.page !== this.state.page
+    ) {
       // console.log(`Попередній запит: ${prevState.SearchQuery}`);
       // console.log(`Поточний запит: ${this.state.SearchQuery}`);
+      // console.log(`Попередня сторінка: ${prevState.page}`);
+      // console.log(`Поточна сторінка: ${this.state.page}`);
 
       this.setState(() => {
         // console.log('loading: true');
-
         return {
           loading: true,
         };
       });
 
-      onFetch(this.state.SearchQuery, 1).then(images => {
+      onFetch(this.state.SearchQuery, this.state.page).then(images => {
         if (images && images.length > 0) {
-          this.setState(() => {
-            // console.log(
-            //   '7. Новий запит, починаємо з першої сторінки, loading: false'
-            // );
-
+          this.setState(prevState => {
             return {
-              images,
-              page: 1,
-              SearchQuery: this.state.SearchQuery,
+              images: [...prevState.images, ...images],
               loading: false,
             };
           });
         } else {
-          // console.log(`Попередній запит: ${prevState.SearchQuery}`);
-          // console.log(`Поточний запит: ${this.state.SearchQuery}`);
           // console.log(
           //   '7.1 Вибачте, немає зображень, що відповідають вашому запиту, loading: false'
           // );
-
           Notify.info('Sorry, there are no pictures matching your search.');
           this.setState({
             images: [],
@@ -121,15 +126,15 @@ export class App extends Component {
     return (
       <div className={css.App}>
         <Searchbar onSubmit={this.handleSearchSubmit} />
+        <ImageGallery
+          images={this.state.images}
+          onShowModal={this.onShowModal}
+        />
         {this.state.loading && (
           <div className={css.Loader}>
             <Loader />
           </div>
         )}
-        <ImageGallery
-          images={this.state.images}
-          onShowModal={this.onShowModal}
-        />
         {this.state.images.length > 0 && <Button loadMore={this.loadMore} />}
         {this.state.showModal && (
           <Modal

@@ -1,6 +1,6 @@
 import React from 'react';
 import css from './styles.module.css';
-import propTypes from 'prop-types';
+import PropTypes from 'prop-types';
 
 export const ImageGalleryItem = props => {
   const { webformatURL, largeImageURL, onShowModal, tags } = props;
@@ -17,8 +17,8 @@ export const ImageGalleryItem = props => {
 };
 
 ImageGalleryItem.propTypes = {
-  webformatURL: propTypes.string,
-  largeImageURL: propTypes.string,
-  onShowModal: propTypes.func,
-  tags: propTypes.string,
+  webformatURL: PropTypes.string.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+  onShowModal: PropTypes.func.isRequired,
+  tags: PropTypes.string.isRequired,
 };
