@@ -53,7 +53,7 @@ img {
   padding-top: 12px;
   padding-bottom: 12px;
   color: #fff;
-  background-color: #3f51b5;
+  background-color: #772bc3;
   box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.2),
     0px 4px 5px 0px rgba(0, 0, 0, 0.14), 0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 }
@@ -83,7 +83,7 @@ img {
 }
 
 .SearchFormButton:hover {
-  background-color: #7994b9;
+  background-color: #9a79b9;
   transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -186,7 +186,7 @@ img {
   margin: 0 auto;
   padding: 8px 16px;
   border-radius: 2px;
-  background-color: #3f51b5;
+  background-color: #772bc3;
   transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
   display: inline-block;
@@ -206,7 +206,7 @@ img {
 
 .Button:hover,
 .Button:focus {
-  background-color: #7994b9;
+  background-color: #9a79b9;
 }
 
 .Loader {

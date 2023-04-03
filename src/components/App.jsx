@@ -1,148 +1,88 @@
-import { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Notify } from 'notiflix';
-
 import { ImageGallery } from './ImageGallery';
-import { Searchbar } from './Searchbar';
+import Searchbar from './Searchbar';
 import { Button } from './Button';
-import { Modal } from './Modal';
+import Modal from './Modal';
 import { Loader } from './Loader';
 import css from './styles.module.css';
 import { onFetch } from './pixabay-api';
 
-export class App extends Component {
-  state = {
-    SearchQuery: '',
-    images: [],
-    page: 1,
-    loading: false,
-    largeImageURL: '',
-    showModal: false,
-  };
+export function App() {
+  const [SearchQuery, setSearchQuery] = useState('');
+  const [images, setImages] = useState([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [largeImageURL, setLargeImageURL] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-  // componentDidMount() {
-  //   console.log('App componentDidMount');
-  // }
-
-  handleSearchSubmit = SearchQuery => {
-    if (SearchQuery !== this.state.SearchQuery) {
-      // console.log(`Попередній запит: ${this.state.SearchQuery}`);
-      // console.log(`Поточний запит: ${SearchQuery}`);
-      // console.log('7. Новий запит, починаємо з першої сторінки');
-
-      this.setState(() => {
-        return {
-          SearchQuery,
-          page: 1,
-        };
-      });
-    }
-    if (SearchQuery === this.state.SearchQuery) {
-      Notify.info(
-        `You are already viewing images for the query ${SearchQuery}.`
-      );
-    } else {
-      this.setState(() => {
-        return {
-          images: [],
-          SearchQuery,
-          page: 1,
-        };
-      });
-    }
-  };
-
-  loadMore = event => {
-    // console.log('loadMore');
-
-    event.preventDefault();
-
-    this.setState(() => {
-      // console.log('8. Завантажуємо наступну сторінку');
-
-      return {
-        page: this.state.page + 1,
-      };
-    });
-  };
-
-  onShowModal = event => {
-    this.setState(() => {
-      // console.log('Відкрили модалку, оновився стейт App');
-
-      return { showModal: true, largeImageURL: event };
-    });
-  };
-
-  onCloseModal = () => {
-    this.setState(() => {
-      // console.log('Закрили модалку, оновився стейт App');
-
-      return { showModal: false, largeImageURL: '' };
-    });
-  };
-
-  componentDidUpdate(prevProps, prevState) {
-    // console.log('App componentDidUpdate');
-
-    if (
-      prevState.SearchQuery !== this.state.SearchQuery ||
-      prevState.page !== this.state.page
-    ) {
-      // console.log(`Попередній запит: ${prevState.SearchQuery}`);
-      // console.log(`Поточний запит: ${this.state.SearchQuery}`);
-      // console.log(`Попередня сторінка: ${prevState.page}`);
-      // console.log(`Поточна сторінка: ${this.state.page}`);
-
-      this.setState(() => {
-        // console.log('loading: true');
-        return {
-          loading: true,
-        };
-      });
-
-      onFetch(this.state.SearchQuery, this.state.page).then(images => {
-        if (images && images.length > 0) {
-          this.setState(prevState => {
-            return {
-              images: [...prevState.images, ...images],
-              loading: false,
-            };
-          });
+  useEffect(() => {
+    // console.log('useEffect');
+    if (SearchQuery !== '') {
+      setLoading(true);
+      onFetch(SearchQuery, page).then(images => {
+        // console.log(`Отримали відповідь onFetch ${images}`);
+        if (images.length > 0) {
+          setImages(prevState => [...prevState, ...images]);
+          setLoading(false);
         } else {
-          // console.log(
-          //   '7.1 Вибачте, немає зображень, що відповідають вашому запиту, loading: false'
-          // );
+          // console.log('Немає зображень, що відповідають запиту');
           Notify.info('Sorry, there are no pictures matching your search.');
-          this.setState({
-            images: [],
-            loading: false,
-          });
+          setImages([]);
+          setLoading(false);
         }
       });
     }
-  }
+  }, [SearchQuery, page]);
 
-  render() {
-    return (
-      <div className={css.App}>
-        <Searchbar onSubmit={this.handleSearchSubmit} />
-        <ImageGallery
-          images={this.state.images}
-          onShowModal={this.onShowModal}
-        />
-        {this.state.loading && (
-          <div className={css.Loader}>
-            <Loader />
-          </div>
-        )}
-        {this.state.images.length > 0 && <Button loadMore={this.loadMore} />}
-        {this.state.showModal && (
-          <Modal
-            largeImage={this.state.largeImageURL}
-            onCloseModal={this.onCloseModal}
-          />
-        )}
-      </div>
-    );
-  }
+  const handleSearchSubmit = newQuery => {
+    if (newQuery !== SearchQuery) {
+      // console.log('Новий запит, починаємо з першої сторінки');
+
+      setSearchQuery(newQuery);
+      setPage(1);
+    }
+    if (newQuery === SearchQuery) {
+      Notify.info(`You are already viewing images for the query ${newQuery}.`);
+    } else {
+      setImages([]);
+      setSearchQuery(newQuery);
+      setPage(1);
+    }
+  };
+
+  const loadMore = event => {
+    // console.log('loadMore');
+
+    event.preventDefault();
+    setPage(prevState => prevState + 1);
+  };
+
+  const onShowModal = event => {
+    // console.log('onShowModal');
+    setShowModal(true);
+    setLargeImageURL(event);
+  };
+
+  const onCloseModal = () => {
+    // console.log('onCloseModal');
+    setShowModal(false);
+    setLargeImageURL('');
+  };
+
+  return (
+    <div className={css.App}>
+      <Searchbar onSubmit={handleSearchSubmit} />
+      <ImageGallery images={images} onShowModal={onShowModal} />
+      {loading && (
+        <div className={css.Loader}>
+          <Loader />
+        </div>
+      )}
+      {images.length > 0 && <Button loadMore={loadMore} />}
+      {showModal && (
+        <Modal largeImage={largeImageURL} onCloseModal={onCloseModal} />
+      )}
+    </div>
+  );
 }

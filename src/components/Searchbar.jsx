@@ -1,68 +1,62 @@
-import { Component } from 'react';
+import React, { useState } from 'react';
 import { Notify } from 'notiflix';
 import { BiSearchAlt } from 'react-icons/bi';
 import PropTypes from 'prop-types';
 import css from './styles.module.css';
 
-export class Searchbar extends Component {
-  state = {
-    inputValue: '',
-  };
+export default function Searchbar({ onSubmit }) {
+  const [inputValue, setInputValue] = useState('');
 
-  handleChange = event => {
+  const handleChange = event => {
     event.preventDefault();
 
-    this.setState(() => {
-      // console.log('1. Ввели пошуковий запит в інпут, оновився стейт Searchbar');
+    setInputValue(() => {
+      // console.log('Ввели пошуковий запит в інпут Searchbar');
 
-      return { inputValue: event.target.value };
+      return event.target.value;
     });
   };
 
-  handleSubmit = event => {
+  const handleSubmit = event => {
     event.preventDefault();
 
-    if (this.state.inputValue.trim() !== '') {
-      // console.log(
-      //   '2. Запит, введений в інпут валідний, відправляємо його в Арр'
-      // );
+    if (inputValue.trim() !== '') {
+      // console.log('Запит валідний, відправляємо його в Арр');
 
-      this.props.onSubmit(this.state.inputValue);
+      onSubmit(inputValue);
     } else {
-      // console.log('2.1 Запит не валідний, виводимо інформаційне вікно');
+      // console.log('Запит не валідний, виводимо інформаційне вікно');
 
       Notify.info('Please enter a valid value.');
       return;
     }
   };
 
-  render() {
-    return (
-      <header className={css.Searchbar}>
-        <form className={css.SearchForm} onSubmit={this.handleSubmit}>
-          <button
-            type="submit"
-            className={css.SearchFormButton}
-            disabled={this.state.inputValue.trim() === ''}
-          >
-            <span className={css.SearchFormButtonLabel}>
-              <BiSearchAlt />
-            </span>
-          </button>
+  return (
+    <header className={css.Searchbar}>
+      <form className={css.SearchForm} onSubmit={handleSubmit}>
+        <button
+          type="submit"
+          className={css.SearchFormButton}
+          disabled={inputValue.trim() === ''}
+        >
+          <span className={css.SearchFormButtonLabel}>
+            <BiSearchAlt />
+          </span>
+        </button>
 
-          <input
-            className={css.SearchFormInput}
-            type="text"
-            autoComplete="off"
-            autoFocus
-            placeholder="Search images and photos"
-            value={this.state.inputValue}
-            onChange={this.handleChange}
-          />
-        </form>
-      </header>
-    );
-  }
+        <input
+          className={css.SearchFormInput}
+          type="text"
+          autoComplete="off"
+          autoFocus
+          placeholder="Search images and photos"
+          value={inputValue}
+          onChange={handleChange}
+        />
+      </form>
+    </header>
+  );
 }
 
 Searchbar.propTypes = {
